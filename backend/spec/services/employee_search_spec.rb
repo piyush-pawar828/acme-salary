@@ -61,6 +61,7 @@ RSpec.describe EmployeeSearch do
     expect(EmployeeSearch.new(per_page: "1000").per_page).to eq(100)
     expect(EmployeeSearch.new(per_page: "abc").per_page).to eq(25)
     expect(EmployeeSearch.new(per_page: "0").per_page).to eq(25)
+    expect(EmployeeSearch.new(page: "99999999999999999999999").page).to eq(EmployeeSearch::MAX_PAGE)
   end
 
   it "paginates and reports the total" do

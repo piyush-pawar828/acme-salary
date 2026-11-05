@@ -8,12 +8,14 @@ class EmployeeSearch
   }.freeze
   DEFAULT_PER_PAGE = 25
   MAX_PER_PAGE = 100
+  # Keeps OFFSET inside a 64-bit integer whatever the URL says.
+  MAX_PAGE = 1_000_000
 
   attr_reader :page, :per_page
 
   def initialize(params)
     @params = params.to_h.with_indifferent_access
-    @page = [ @params[:page].to_i, 1 ].max
+    @page = @params[:page].to_i.clamp(1, MAX_PAGE)
     @per_page = clamp_per_page(@params[:per_page])
   end
 

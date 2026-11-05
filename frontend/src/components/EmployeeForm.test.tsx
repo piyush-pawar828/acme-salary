@@ -12,6 +12,7 @@ const meta: Meta = {
     { id: 10, name: "Engineering" },
     { id: 11, name: "Sales" },
   ],
+  today: "2026-01-15",
 };
 
 describe("EmployeeForm", () => {
@@ -42,6 +43,11 @@ describe("EmployeeForm", () => {
       },
       { amount: "1000000", effective_on: "2024-03-01", note: "" },
     );
+  });
+
+  it("caps the initial salary date at the server's today", () => {
+    render(<EmployeeForm mode="create" meta={meta} onSubmit={vi.fn()} />);
+    expect(screen.getByLabelText(/effective from/i)).toHaveAttribute("max", "2026-01-15");
   });
 
   it("shows the selected country's currency next to the salary", async () => {

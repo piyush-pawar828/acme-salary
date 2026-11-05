@@ -6,7 +6,8 @@ export type CountryRef = { code: string; name: string; currency_code: string };
 export type DepartmentRef = { id: number; name: string };
 
 export type Country = CountryRef & { id: number; usd_rate: string; rate_as_of: string };
-export type Meta = { countries: Country[]; departments: DepartmentRef[] };
+/** `today` is the server's calendar date: the single source of truth for date limits. */
+export type Meta = { today: string; countries: Country[]; departments: DepartmentRef[] };
 
 export type SalarySummary = {
   amount: string;

@@ -8,9 +8,3 @@ export function formatDate(iso: string): string {
   });
 }
 
-/** Today's date as YYYY-MM-DD in the browser's local time zone. */
-export function todayIso(): string {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60_000;
-  return new Date(now.getTime() - offset).toISOString().slice(0, 10);
-}

@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/NativeSelect";
 import { FieldError } from "@/components/FieldError";
-import { todayIso } from "@/lib/dates";
 import type { FieldErrors } from "@/api/client";
 import type { EmployeeInput, Meta, SalaryInput } from "@/api/types";
 
@@ -119,7 +118,7 @@ export function EmployeeForm({ mode, meta, initial, errors = {}, busy = false, o
             <Input
               id="salary_effective_on"
               type="date"
-              max={todayIso()}
+              max={meta.today}
               value={salary.effective_on}
               onChange={(e) => setSalary({ ...salary, effective_on: e.target.value })}
               required

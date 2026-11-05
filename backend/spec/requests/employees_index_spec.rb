@@ -6,6 +6,17 @@ RSpec.describe "GET /api/employees" do
     expect(response).to have_http_status(:unauthorized)
   end
 
+  it "never 500s on absurd pagination input" do
+    sign_in(create_user)
+    create_employee
+
+    get "/api/employees", params: { page: "99999999999999999999999", per_page: "-5" }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body["data"]).to eq([])
+    expect(response.parsed_body["meta"]).to include("per_page" => 25, "total" => 1)
+  end
+
   it "returns paginated summaries with meta" do
     sign_in(create_user)
     india = create_country(code: "IN", name: "India", currency_code: "INR", usd_rate: 0.012)

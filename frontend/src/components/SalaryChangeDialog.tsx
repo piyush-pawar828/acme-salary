@@ -4,20 +4,21 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/FieldError";
-import { todayIso } from "@/lib/dates";
 import type { FieldErrors } from "@/api/client";
 import type { SalaryInput } from "@/api/types";
 
 type FormProps = {
   currency: string;
+  /** Server's calendar date (from /api/meta); default and upper bound for the effective date. */
+  today: string;
   errors?: FieldErrors;
   busy?: boolean;
   onSubmit: (salary: SalaryInput) => void | Promise<void>;
 };
 
-export function SalaryChangeForm({ currency, errors = {}, busy = false, onSubmit }: FormProps) {
+export function SalaryChangeForm({ currency, today, errors = {}, busy = false, onSubmit }: FormProps) {
   const [amount, setAmount] = useState("");
-  const [effectiveOn, setEffectiveOn] = useState(todayIso());
+  const [effectiveOn, setEffectiveOn] = useState(today);
   const [note, setNote] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -41,7 +42,7 @@ export function SalaryChangeForm({ currency, errors = {}, busy = false, onSubmit
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="new_effective_on">Effective from</Label>
-        <Input id="new_effective_on" type="date" max={todayIso()} value={effectiveOn} onChange={(e) => setEffectiveOn(e.target.value)} />
+        <Input id="new_effective_on" type="date" max={today} value={effectiveOn} onChange={(e) => setEffectiveOn(e.target.value)} />
         <FieldError messages={errors.effective_on} />
       </div>
       <div className="grid gap-1.5">

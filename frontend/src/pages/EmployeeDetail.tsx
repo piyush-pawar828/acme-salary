@@ -108,6 +108,7 @@ export function EmployeeDetail() {
               if (!open) setSalaryErrors({});
             }}
             currency={data.country.currency_code}
+            today={meta.data?.today ?? data.hired_on}
             errors={salaryErrors}
             busy={addSalary.isPending}
             onSubmit={(salary) => addSalary.mutate(salary)}

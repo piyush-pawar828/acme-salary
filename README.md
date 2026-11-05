@@ -2,7 +2,7 @@
 
 Web application for ACME's HR Manager to manage salary records for 10,000 employees across eight countries and answer questions about how the organisation pays people. Built as a take-home assessment.
 
-**Live demo:** _URL added after deployment_ · sign in with `hr@acme.example` and the demo password supplied separately.
+**Live demo:** https://acme-salary-3woe.onrender.com · sign in with `hr@acme.example` and the demo password supplied separately. Hosted on Render's free tier, so the first request after a period of inactivity takes 30 to 60 seconds while the service wakes and reseeds.
 
 ## What it does
 

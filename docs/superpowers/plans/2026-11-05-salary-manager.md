@@ -16,7 +16,6 @@
 - All API routes under `/api`, JSON only, 401 when unauthenticated, 422 with `{ errors: { field: [msg] } }` on validation failure.
 - Amounts are `decimal(14,2)`; USD conversion is `amount * countries.usd_rate`; every USD figure in the UI is labelled "USD (converted)".
 - `effective_on` must be `<= Date.current`. `country_id` cannot change after creation. Hard delete.
-- Levels: `IC1 IC2 IC3 IC4 IC5 IC6 M1 M2 M3`. Employee numbers: `ACME-` + 6-digit zero-padded sequence.
 - Pagination: default `per_page` 25, max 100, `page` ≥ 1.
 - Tests touch no network and no wall clock (`travel_to` where dates matter).
 - Commits: one per task, authored as the repo's configured user, no co-author trailers.
@@ -90,7 +89,7 @@ git add backend && git commit -m "chore: Rails 8 API skeleton with RSpec and hea
 ### Task 2: Schema and models
 
 **Files:**
-- Create: migrations for `users`, `countries`, `departments`, `employees`, `salaries`; `app/models/{user,country,department,employee,salary}.rb`; `app/models/concerns/levels.rb`; `spec/models/*_spec.rb`; `spec/support/factories.rb` (plain Ruby helpers, no FactoryBot)
+- Create: migrations for `users`, `countries`, `departments`, `employees`, `salaries`; `app/models/{user,country,department,employee,salary}.rb`; `spec/models/*_spec.rb`; `spec/support/factories.rb` (plain Ruby helpers, no FactoryBot)
 - Modify: `spec/rails_helper.rb` (require support files)
 
 **Interfaces:**
@@ -98,9 +97,8 @@ git add backend && git commit -m "chore: Rails 8 API skeleton with RSpec and hea
   - `User` with `has_secure_password`, `name`, `email` (unique, downcased).
   - `Country` with `code`, `name`, `currency_code`, `usd_rate` (decimal 12,6), `rate_as_of` (date); `has_many :employees`.
   - `Department` with `name` (unique).
-  - `Employee` with `employee_number`, `first_name`, `last_name`, `email`, `country_id`, `department_id`, `job_title`, `level`, `hired_on`, `current_salary_id` (nullable at DB level, set by Task 4 service). `belongs_to :country, :department, :current_salary (class Salary, optional)`; `has_many :salaries, dependent: :destroy`. Validates presence of all fields, `level` in `Levels::ALL`, email format and uniqueness (case-insensitive), `country_id` immutable on update. `Employee.next_employee_number -> String`. `def full_name`.
+  - `Employee` with `first_name`, `last_name`, `email`, `country_id`, `department_id`, `job_title`, `hired_on`, `current_salary_id` (nullable at DB level, set by Task 4 service). `belongs_to :country, :department, :current_salary (class Salary, optional)`; `has_many :salaries, dependent: :destroy`. Validates presence of all fields, email format and uniqueness (case-insensitive), `country_id` immutable on update. `def full_name`.
   - `Salary` with `employee_id`, `amount`, `currency_code`, `effective_on`, `note`, `created_by_id`; `belongs_to :employee`, `belongs_to :created_by, class_name: "User"`. Validates `amount > 0`, `amount <= 9_999_999_999.99`, `effective_on <= Date.current`.
-  - `Levels::ALL = %w[IC1 IC2 IC3 IC4 IC5 IC6 M1 M2 M3].freeze`.
   - `spec/support/factories.rb`: `create_user(**)`, `create_country(**)`, `create_department(**)`, `create_employee(**)` (creates country/department if not given, no salary), `create_salary(employee:, **)`.
 - Schema indexes exactly as in the spec. `employees.current_salary_id` has an FK to `salaries` with `on_delete: :nullify`. `salaries.employee_id` FK with `on_delete: :cascade`.
 
@@ -109,10 +107,9 @@ git add backend && git commit -m "chore: Rails 8 API skeleton with RSpec and hea
 Minimum assertions, one `it` each:
 ```ruby
 # employee_spec.rb
-it "rejects an unknown level"              # level: "L9" → invalid, errors[:level]
+it "requires first name, last name, job title and hire date"
 it "rejects duplicate email ignoring case" # "A@x.com" then "a@x.com" → invalid
 it "rejects changing country"              # update country_id → invalid, errors[:country_id] includes "cannot be changed"
-it "generates sequential employee numbers" # first → "ACME-000001", after one exists → "ACME-000002"
 # salary_spec.rb
 it "rejects a future effective_on"         # travel_to Date.new(2026,11,5); effective_on 2026-11-06 → invalid
 it "rejects zero and negative amounts"
@@ -126,7 +123,7 @@ Run: `bundle exec rspec spec/models` — Expected: errors, no such table.
 
 - [ ] **Step 3: Write migrations and models**
 
-`Employee.next_employee_number`: `format("ACME-%06d", (maximum(:id) || 0) + 1)`. Immutable country via `validate :country_unchanged, on: :update` using `country_id_changed?`.
+Immutable country via `validate :country_unchanged, on: :update` using `country_id_changed?`.
 
 - [ ] **Step 4: Run, expect pass**
 
@@ -146,7 +143,7 @@ git add backend && git commit -m "feat: schema and models for users, countries, 
 - Create: `backend/app/lib/stats.rb`, `backend/spec/lib/stats_spec.rb`
 
 **Interfaces:**
-- Produces: `Stats.summarize(values : Array<Numeric>) -> { count:, total:, mean:, median:, min:, max: }` (all `BigDecimal` rounded to 2 places except count; `{ count: 0, total: 0, mean: nil, median: nil, min: nil, max: nil }` for empty). `Stats.histogram(values, buckets: 10) -> Array<{ from:, to:, count: }>` with equal-width buckets over `[min, max]`; a single distinct value yields one bucket.
+- Produces: `Stats.summarize(values : Array<Numeric>) -> { count:, total:, mean:, median:, min:, max: }` (all `BigDecimal` rounded to 2 places except count; `{ count: 0, total: 0, mean: nil, median: nil, min: nil, max: nil }` for empty).
 
 - [ ] **Step 1: Failing specs**
 
@@ -155,8 +152,6 @@ it "summarizes odd count"   { Stats.summarize([3, 1, 2]) median 2, mean 2, total
 it "summarizes even count"  { Stats.summarize([1, 2, 3, 4]) median 2.5 }
 it "handles empty"          { count 0, mean nil }
 it "single value summary"   { [7] → mean 7, median 7 }
-it "builds 10 buckets"      { histogram(0..100 step 10 values) → 10 buckets, counts sum to size }
-it "one bucket for one distinct value"
 ```
 
 - [ ] **Step 2: Run, expect NameError** — `bundle exec rspec spec/lib/stats_spec.rb`
@@ -165,7 +160,7 @@ it "one bucket for one distinct value"
 
 - [ ] **Step 4: Run, expect pass**
 
-- [ ] **Step 5: Commit** — `git commit -m "feat: Stats module for mean, median and histogram"`
+- [ ] **Step 5: Commit** — `git commit -m "feat: Stats module for mean, median, min and max"`
 
 ---
 
@@ -177,7 +172,7 @@ it "one bucket for one distinct value"
 **Interfaces:**
 - Produces:
   - `SalaryChange.call(employee:, amount:, effective_on:, note: nil, by:) -> Salary` (raises `ActiveRecord::RecordInvalid` on invalid). Inside one transaction: insert `Salary` with `currency_code: employee.country.currency_code`, then set `employee.current_salary` to the salary with greatest `[effective_on, id]` among the employee's salaries.
-  - `EmployeeCreate.call(attrs:, salary: { amount:, effective_on: }, by:) -> Employee` in one transaction: assigns `employee_number` via `Employee.next_employee_number`, saves employee, calls `SalaryChange`. Raises `RecordInvalid` with errors merged so a bad salary surfaces as `salary.amount` / `salary.effective_on` keys.
+  - `EmployeeCreate.call(attrs:, salary: { amount:, effective_on: }, by:) -> Employee` in one transaction: saves employee, calls `SalaryChange`. Raises `RecordInvalid` with errors merged so a bad salary surfaces as `salary.amount` / `salary.effective_on` keys.
 
 - [ ] **Step 1: Failing specs**
 
@@ -190,7 +185,7 @@ it "breaks same-day ties by id"                       # two rows same date → l
 it "rejects future effective_on"                      # raises RecordInvalid, no row inserted
 it "records who made the change"                      # created_by == user
 # employee_create_spec.rb
-it "creates employee with number and current salary"  # employee_number "ACME-000001", current_salary.amount == 50000
+it "creates employee with current salary"             # current_salary.amount == 50000, salaries.count == 1
 it "rolls back employee when salary invalid"          # Employee.count stays 0, errors include "salary.amount"
 ```
 
@@ -211,13 +206,13 @@ it "rolls back employee when salary invalid"          # Employee.count stays 0, 
 
 **Interfaces:**
 - Produces: `bin/rails db:seed` creating 1 user (`hr@acme.example`, password `ENV.fetch("SEED_HR_PASSWORD", "acme-hr-2026")`), 8 countries, 10 departments, 10,000 employees, 1–3 salaries each, `current_salary_id` set. Idempotent: exits early if `Employee.count > 0`.
-- `SeedData::COUNTRIES`: `[code, name, currency, usd_rate]` for US 1.0, IN 0.0120, GB 1.27, DE 1.08, CA 0.72, AU 0.65, SG 0.74, BR 0.17; `rate_as_of` 2026-11-01. `SeedData::COST_MULTIPLIER` per country (US 1.0, GB 0.85, DE 0.8, CA 0.8, AU 0.85, SG 0.8, BR 0.35, IN 0.25). `SeedData::USD_BAND` per level: IC1 55k, IC2 75k, IC3 100k, IC4 135k, IC5 175k, IC6 220k, M1 150k, M2 195k, M3 250k. `SeedData::DEPARTMENTS` (10) with job titles per department. `SeedData.salary_for(level:, country_code:, rng:) -> BigDecimal` = band × multiplier × jitter in 0.85..1.15 / usd_rate, rounded to 2 places.
+- `SeedData::COUNTRIES`: `[code, name, currency, usd_rate]` for US 1.0, IN 0.0120, GB 1.27, DE 1.08, CA 0.72, AU 0.65, SG 0.74, BR 0.17; `rate_as_of` 2026-11-01. `SeedData::COST_MULTIPLIER` per country (US 1.0, GB 0.85, DE 0.8, CA 0.8, AU 0.85, SG 0.8, BR 0.35, IN 0.25). `SeedData::DEPARTMENTS` (10), each with job titles as `[title, usd_band]` pairs (e.g. Engineering: `["Junior Software Engineer", 60_000], ["Software Engineer", 95_000], ["Senior Software Engineer", 135_000], ["Engineering Manager", 170_000]`). `SeedData.salary_for(usd_band:, country_code:, rng:) -> BigDecimal` = band × multiplier × jitter in 0.85..1.15 / usd_rate, rounded to 2 places.
 
 - [ ] **Step 1: Failing spec for `SeedData.salary_for`**
 
 ```ruby
 it "is deterministic for a given rng seed"          # same Random.new(1) twice → equal
-it "scales by country and level"                    # IC3 in IN (local INR) > IC1 in IN; IC3 US > IC3 IN in USD terms
+it "scales by country and band"                     # band 135k in IN (local INR) > band 60k in IN; band 135k US > band 135k IN in USD terms
 ```
 
 - [ ] **Step 2: Run, expect NameError**
@@ -273,25 +268,25 @@ it "protects other endpoints"                                 # GET /api/health 
 
 **Interfaces:**
 - Produces:
-  - `EmployeeSearch.new(params) -> #relation, #page, #per_page, #total`. Params: `q`, `country` (code), `department` (id), `level`, `sort` in `%w[name salary hired_on]` (default `name`), `dir` in `%w[asc desc]`, `page`, `per_page`. `relation` is `Employee.includes(:country, :department, :current_salary)` ordered; sort by `salary` orders by `salaries.amount * countries.usd_rate` via joins.
-  - `EmployeeSerializer.summary(employee) -> Hash`: `{ id, employee_number, first_name, last_name, full_name, email, country: {code, name, currency_code}, department: {id, name}, job_title, level, hired_on, salary: { amount, currency_code, effective_on, usd: amount*rate rounded 2 } }`.
+  - `EmployeeSearch.new(params) -> #relation, #page, #per_page, #total`. Params: `q`, `country` (code), `department` (id), `sort` in `%w[name salary hired_on]` (default `name`), `dir` in `%w[asc desc]`, `page`, `per_page`. `relation` is `Employee.includes(:country, :department, :current_salary)` ordered; sort by `salary` orders by `salaries.amount * countries.usd_rate` via joins.
+  - `EmployeeSerializer.summary(employee) -> Hash`: `{ id, first_name, last_name, full_name, email, country: {code, name, currency_code}, department: {id, name}, job_title, hired_on, salary: { amount, currency_code, effective_on, usd: amount*rate rounded 2 } }`.
   - `GET /api/employees` → `{ data: [summary...], meta: { page, per_page, total, total_pages } }`.
-  - `GET /api/meta` → `{ countries: [{id, code, name, currency_code, usd_rate, rate_as_of}], departments: [{id, name}], levels: [...] }`.
+  - `GET /api/meta` → `{ countries: [{id, code, name, currency_code, usd_rate, rate_as_of}], departments: [{id, name}] }`.
 
 - [ ] **Step 1: Failing specs**
 
 ```ruby
 # employee_search_spec.rb
-it "matches name, email and employee number case-insensitively"
+it "matches name and email case-insensitively"
 it "treats % and _ in q literally"                     # employee "50% Off" exists; q "%" matches only it, not everyone
-it "filters by country, department and level together"
+it "filters by country and department together"
 it "sorts by USD salary desc across currencies"         # INR 8,000,000 (≈96k USD) sorts above USD 90,000
 it "clamps page and per_page"                           # page "0" → 1; per_page "1000" → 100; per_page "abc" → 25
 # employees_index_spec.rb
 it "requires login"                                     # 401
 it "returns paginated summaries with meta"
 # meta_spec.rb
-it "returns countries, departments and levels"
+it "returns countries and departments"
 ```
 
 - [ ] **Step 2: Run, expect failures**
@@ -314,7 +309,7 @@ it "returns countries, departments and levels"
 - Produces:
   - `EmployeeSerializer.detail(employee)` = `summary` + `salary_history: [{ id, amount, currency_code, usd, effective_on, note, created_by: {id, name}, created_at }]` ordered newest first.
   - `GET /api/employees/:id` → detail. 404 `{ errors: { base: ["not found"] } }`.
-  - `POST /api/employees` body `{ employee: { first_name, last_name, email, country_id, department_id, job_title, level, hired_on }, salary: { amount, effective_on, note } }` → 201 detail.
+  - `POST /api/employees` body `{ employee: { first_name, last_name, email, country_id, department_id, job_title, hired_on }, salary: { amount, effective_on, note } }` → 201 detail.
   - `PATCH /api/employees/:id` body `{ employee: {...} }`; `country_id` present → 422 `errors.country_id`.
   - `DELETE /api/employees/:id` → 204.
   - `POST /api/employees/:id/salaries` `{ salary: { amount, effective_on, note } }` → 201 detail.
@@ -323,7 +318,7 @@ it "returns countries, departments and levels"
 - [ ] **Step 1: Failing specs**
 
 ```ruby
-it "creates an employee with initial salary"              # 201, employee_number "ACME-000001", salary_history size 1
+it "creates an employee with initial salary"              # 201, salary_history size 1
 it "returns 422 for duplicate email"                      # not 500
 it "returns 422 for invalid salary on create"             # errors["salary.amount"]
 it "updates profile fields"
@@ -347,16 +342,15 @@ it "shows history newest first with usd"
 ### Task 9: Analytics queries and endpoints
 
 **Files:**
-- Create: `app/queries/analytics/overview.rb`, `app/queries/analytics/group_stats.rb`, `app/queries/analytics/distribution.rb`, `app/queries/analytics/extremes.rb`, `app/controllers/api/analytics_controller.rb`, `spec/queries/analytics_spec.rb`, `spec/requests/analytics_spec.rb`
+- Create: `app/queries/analytics/overview.rb`, `app/queries/analytics/group_stats.rb`, `app/queries/analytics/extremes.rb`, `app/controllers/api/analytics_controller.rb`, `spec/queries/analytics_spec.rb`, `spec/requests/analytics_spec.rb`
 
 **Interfaces:**
 - Produces (all USD, 2 dp, keyed as in the spec):
   - `Analytics::Overview.call -> { headcount:, total_payroll_usd:, mean_usd:, median_usd:, countries:, departments: }`.
-  - `Analytics::GroupStats.call(by:) -> Array<{ key:, label:, headcount:, total_usd:, mean_usd:, median_usd:, min_usd:, max_usd: }>` sorted by `total_usd` desc; `by` in `%w[country department level]`, otherwise `ArgumentError` → 400.
-  - `Analytics::Distribution.call(level:, country: nil) -> { level:, country:, headcount:, buckets: Stats.histogram(...) }`.
+  - `Analytics::GroupStats.call(by:) -> Array<{ key:, label:, headcount:, total_usd:, mean_usd:, median_usd:, min_usd:, max_usd: }>` sorted by `total_usd` desc; `by` in `%w[country department]`, otherwise `ArgumentError` → 400.
   - `Analytics::Extremes.call(limit: 10) -> { top: [summary...], bottom: [summary...] }`.
   - Each query runs exactly one SQL statement fetching `(group_key, amount * usd_rate)` pairs, then `Stats`.
-  - Routes: `get "analytics/overview"`, `"analytics/groups"`, `"analytics/distribution"`, `"analytics/extremes"`.
+  - Routes: `get "analytics/overview"`, `"analytics/groups"`, `"analytics/extremes"`.
 
 - [ ] **Step 1: Failing specs** with a fixture of 5 employees across 2 countries (US rate 1.0, IN rate 0.01) and 2 departments, amounts chosen so answers are hand-checkable:
 
@@ -365,7 +359,6 @@ it "overview converts to USD"                            # IN 5,000,000 → 50,0
 it "group by country gives per-country median"
 it "single-member group has median == mean"
 it "omits departments with no employees"
-it "distribution for a level returns buckets summing to headcount"
 it "extremes returns top and bottom by USD"
 it "groups rejects unknown dimension with 400"
 it "runs one query per endpoint"                          # expect { ... }.to make_database_queries(count: 1) OR count via ActiveSupport::Notifications subscriber
@@ -377,7 +370,7 @@ it "runs one query per endpoint"                          # expect { ... }.to ma
 
 - [ ] **Step 4: Run, expect pass**; also `bin/rails runner` timing against the seed: each endpoint < 100 ms, record numbers for Task 15.
 
-- [ ] **Step 5: Commit** — `git commit -m "feat: analytics overview, group stats, distribution and extremes"`
+- [ ] **Step 5: Commit** — `git commit -m "feat: analytics overview, group stats and extremes"`
 
 ---
 
@@ -391,7 +384,7 @@ it "runs one query per endpoint"                          # expect { ... }.to ma
 - Produces:
   - Tailwind v4 + shadcn/ui initialised (`button card dialog input label select table badge alert pagination skeleton`).
   - `api<T>(path, init?) : Promise<T>` throws `ApiError { status, errors }`; on 401 dispatches `window.dispatchEvent(new Event("unauthorized"))`.
-  - `types.ts` mirrors Task 7/8/9 JSON shapes (`EmployeeSummary`, `EmployeeDetail`, `SalaryRow`, `Meta`, `Page<T>`, `Overview`, `GroupStat`, `Distribution`, `Extremes`).
+  - `types.ts` mirrors Task 7/8/9 JSON shapes (`EmployeeSummary`, `EmployeeDetail`, `SalaryRow`, `Meta`, `Page<T>`, `Overview`, `GroupStat`, `Extremes`).
   - `formatMoney(amount: string|number, currency: string) : string` via `Intl.NumberFormat("en-US", { style: "currency", currency })`.
   - `<Money amount currency usd? />` renders local amount and, when `usd` is given, a muted `"≈ $96,000.00 USD (converted)"` line.
 
@@ -423,7 +416,7 @@ test("api emits unauthorized on 401")
 - Create: `src/App.tsx` (router, QueryClient, auth gate), `src/pages/Login.tsx`, `src/pages/Employees.tsx`, `src/components/EmployeeTable.tsx`, `src/components/EmployeeFilters.tsx`, `src/components/Layout.tsx` (nav: Employees, Dashboard, logout), `src/lib/query-string.ts`, `src/lib/query-string.test.ts`, `src/components/EmployeeTable.test.tsx`, `src/pages/Login.test.tsx`
 
 **Interfaces:**
-- Produces: routes `/login`, `/employees` (default), `/employees/new`, `/employees/:id`, `/dashboard`. Unauthenticated → redirect to `/login`. `useSearchState()` reads/writes `q, country, department, level, sort, dir, page` from URL. Table columns: number, name, country, department, title, level, salary (local + USD line), hired. Row click → detail.
+- Produces: routes `/login`, `/employees` (default), `/employees/new`, `/employees/:id`, `/dashboard`. Unauthenticated → redirect to `/login`. `useSearchState()` reads/writes `q, country, department, sort, dir, page` from URL. Table columns: id, name, country, department, title, salary (local + USD line), hired. Row click → detail.
 
 - [ ] **Step 1: Failing tests**
 
@@ -466,10 +459,10 @@ test("salary dialog rejects empty amount client-side and submits valid payload")
 ### Task 13: Dashboard UI
 
 **Files:**
-- Create: `src/pages/Dashboard.tsx`, `src/components/StatCard.tsx`, `src/components/GroupTable.tsx`, `src/components/GroupBarChart.tsx`, `src/components/Histogram.tsx`, `src/components/ExtremesTable.tsx`, tests `GroupTable.test.tsx`, `Dashboard.test.tsx`
+- Create: `src/pages/Dashboard.tsx`, `src/components/StatCard.tsx`, `src/components/GroupTable.tsx`, `src/components/GroupBarChart.tsx`, `src/components/ExtremesTable.tsx`, tests `GroupTable.test.tsx`, `Dashboard.test.tsx`
 
 **Interfaces:**
-- Produces: dashboard sections in order: overview cards (headcount, total payroll, mean, median — all "USD (converted)"), group stats with a `by` toggle (country / department / level) shown as a bar chart of median and a table, distribution with level + country selects, top/bottom 10 tables. Charts via Recharts `BarChart`. Loading via `Skeleton`, errors via `Alert`.
+- Produces: dashboard sections in order: overview cards (headcount, total payroll, mean, median — all "USD (converted)"), group stats with a `by` toggle (country / department) shown as a bar chart of median and a table, top/bottom 10 tables. Charts via Recharts `BarChart`. Loading via `Skeleton`, errors via `Alert`.
 
 - [ ] **Step 1: Failing tests**
 

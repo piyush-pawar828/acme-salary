@@ -5,18 +5,18 @@
 
 ## Goal
 
-A web application in which the HR Manager can keep every employee's salary record accurate with minimal effort, and can answer questions about pay across countries, departments and levels in seconds instead of hours.
+A web application in which the HR Manager can keep every employee's salary record accurate with minimal effort, and can answer questions about pay across countries and departments in seconds instead of hours.
 
 ## In scope
 
 | Area | What the HR Manager can do |
 |---|---|
 | Sign in | Log in as the single HR Manager account. Every write is attributed to that user. |
-| Employee directory | Browse all 10,000 employees in a paginated table. Search by name, email or employee number. Filter by country, department and level. Sort by name, salary and hire date. |
+| Employee directory | Browse all 10,000 employees in a paginated table. Search by name or email. Filter by country and department. Sort by name, salary and hire date. |
 | Employee record | View one employee's profile and full salary history. Add an employee, edit profile fields, delete an employee (with confirmation). |
 | Salary changes | Record a new salary with an effective date. The previous salary is kept, not overwritten, so the record shows how pay changed over time and who changed it. |
 | Multi-currency | Salaries are stored in the employee's local currency. A fixed exchange rate table converts to USD for cross-country comparison. Every converted figure is labelled "USD (converted)" and the local amount is shown alongside. |
-| Pay analytics | Dashboard answering: headcount and total annual payroll (USD) overall and per country/department; average, median, minimum and maximum salary per country, department and level; salary distribution within a level; highest and lowest paid employees. |
+| Pay analytics | Dashboard answering: headcount and total annual payroll (USD) overall and per country/department; average, median, minimum and maximum salary per country and per department; highest and lowest paid employees. |
 | Seed data | A deterministic seed script generating 10,000 realistic employees across 8 countries and 10 departments, each with a salary history. |
 
 ## Deliberately out of scope

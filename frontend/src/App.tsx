@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Layout } from "@/components/Layout";
 import { Login } from "@/pages/Login";
 import { Employees } from "@/pages/Employees";
+import { EmployeeNew } from "@/pages/EmployeeNew";
+import { EmployeeDetail } from "@/pages/EmployeeDetail";
 import { session } from "@/api/session";
 import type { User } from "@/api/types";
 
@@ -53,8 +55,8 @@ function Shell() {
         <Route element={<Layout user={user} onLogout={logout} />}>
           <Route path="/" element={<Navigate to="/employees" replace />} />
           <Route path="/employees" element={<Employees />} />
-          <Route path="/employees/new" element={<Placeholder title="New employee" />} />
-          <Route path="/employees/:id" element={<Placeholder title="Employee" />} />
+          <Route path="/employees/new" element={<EmployeeNew />} />
+          <Route path="/employees/:id" element={<EmployeeDetail />} />
           <Route path="/dashboard" element={<Placeholder title="Dashboard" />} />
         </Route>
       ) : (

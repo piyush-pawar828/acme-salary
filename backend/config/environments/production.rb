@@ -13,7 +13,9 @@ Rails.application.configure do
   config.consider_all_requests_local = false
 
   # Cache assets for far-future expiry since they are all digest stamped.
-  config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.year.to_i}" }
+  # Rails serves the compiled React app from public/. Vite assets are content-
+  # hashed, but index.html is not, so everything revalidates via ETag.
+  config.public_file_server.headers = { "cache-control" => "public, max-age=0, must-revalidate" }
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"

@@ -1,0 +1,19 @@
+# Render blueprint: one Docker web service on the free plan.
+# Free instances have no persistent disk and spin down when idle, so the
+# SQLite database is re-created and re-seeded on each cold start.
+services:
+  - type: web
+    name: acme-salary
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: SEED_HR_PASSWORD
+        sync: false
+      - key: RAILS_LOG_TO_STDOUT
+        value: "1"

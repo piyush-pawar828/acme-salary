@@ -1,0 +1,14 @@
+.git
+.gitignore
+.superpowers
+docs
+**/node_modules
+**/.env*
+backend/log/*
+backend/tmp/*
+backend/storage/*
+backend/db/*.sqlite3*
+backend/public/*
+backend/config/master.key
+backend/.bundle
+frontend/dist

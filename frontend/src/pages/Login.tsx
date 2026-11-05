@@ -38,7 +38,14 @@ export function Login({ onLogin }: Props) {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>ACME Salary Manager</CardTitle>
-          <CardDescription>Sign in as the HR Manager to continue.</CardDescription>
+          <CardDescription>
+            Sign in as the HR Manager to continue.
+            {import.meta.env.PROD && (
+              <span className="mt-2 block text-xs">
+                Demo environment with seeded sample data. Edits are kept while the server is up and reset when it restarts.
+              </span>
+            )}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="grid gap-4">

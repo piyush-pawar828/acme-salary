@@ -29,4 +29,6 @@ test:
 # ensure the database is located in a persisted volume.
 production:
   <<: *default
-  # database: path/to/persistent/storage/production.sqlite3
+  # Lives on the container filesystem. Mount a persistent disk at storage/
+  # to keep edits across restarts; without one the seed re-creates it.
+  database: storage/production.sqlite3

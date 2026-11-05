@@ -6,16 +6,13 @@ import { Login } from "@/pages/Login";
 import { Employees } from "@/pages/Employees";
 import { EmployeeNew } from "@/pages/EmployeeNew";
 import { EmployeeDetail } from "@/pages/EmployeeDetail";
+import { Dashboard } from "@/pages/Dashboard";
 import { session } from "@/api/session";
 import type { User } from "@/api/types";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
 });
-
-function Placeholder({ title }: { title: string }) {
-  return <h1 className="text-2xl font-semibold">{title}</h1>;
-}
 
 function Shell() {
   const navigate = useNavigate();
@@ -57,7 +54,7 @@ function Shell() {
           <Route path="/employees" element={<Employees />} />
           <Route path="/employees/new" element={<EmployeeNew />} />
           <Route path="/employees/:id" element={<EmployeeDetail />} />
-          <Route path="/dashboard" element={<Placeholder title="Dashboard" />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />

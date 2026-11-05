@@ -17,6 +17,22 @@ module EmployeeSerializer
     }
   end
 
+  def detail(employee)
+    history = employee.salaries.sort_by { |s| [s.effective_on, s.id] }.reverse
+    summary(employee).merge(
+      salary_history: history.map { |s| history_row(s, employee.country) }
+    )
+  end
+
+  def history_row(salary, country)
+    salary(salary, country).merge(
+      id: salary.id,
+      note: salary.note,
+      created_by: { id: salary.created_by.id, name: salary.created_by.name },
+      created_at: salary.created_at
+    )
+  end
+
   def salary(salary, country)
     {
       amount: salary.amount,

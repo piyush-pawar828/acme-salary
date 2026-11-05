@@ -3,6 +3,8 @@ Rails.application.routes.draw do
     get "health", to: "health#show"
     resource :session, only: [:show, :create, :destroy]
     resource :meta, only: :show
-    resources :employees, only: [:index]
+    resources :employees, only: [:index, :show, :create, :update, :destroy] do
+      resources :salaries, only: :create
+    end
   end
 end

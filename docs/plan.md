@@ -1,14 +1,12 @@
 # Salary Manager Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** A deployed Rails + React app in which an HR Manager manages 10,000 employees' salaries across countries and answers pay questions from a dashboard.
 
 **Architecture:** Rails 8 API (SQLite) with thin controllers over services and query objects; append-only salary history with a cached `current_salary_id`; analytics fetched in one SQL round-trip and reduced in Ruby. Vite/React SPA built into `backend/public` and served by Rails in production.
 
 **Tech Stack:** Ruby 3.3.4, Rails 8.0, SQLite, RSpec, Faker, bcrypt. Node 22, Vite, React 18, TypeScript, Tailwind v4, shadcn/ui, react-router, TanStack Query, Recharts, Vitest, React Testing Library. Docker, Render.
 
-**Spec:** `docs/superpowers/specs/2026-11-04-salary-manager-design.md` (and `docs/requirements.md`).
+**Design:** `docs/design.md` (and `docs/requirements.md`).
 
 ## Global Constraints
 
@@ -18,7 +16,7 @@
 - `effective_on` must be `<= Date.current`. `country_id` cannot change after creation. Hard delete.
 - Pagination: default `per_page` 25, max 100, `page` ≥ 1.
 - Tests touch no network and no wall clock (`travel_to` where dates matter).
-- Commits: one per task, authored as the repo's configured user, no co-author trailers.
+- Commits: one per task.
 - Nothing from the seed is referenced by tests.
 
 ## Review Focus
@@ -499,14 +497,14 @@ test("Dashboard switches group dimension and refetches")   // mocked api called 
 ### Task 15: README, AI usage notes, performance, demo script
 
 **Files:**
-- Create: `README.md`, `docs/ai-usage.md`, `docs/performance.md`, `docs/demo-script.md`, `CLAUDE.md` (project conventions used during the build)
+- Create: `README.md`, `docs/ai-usage.md`, `docs/performance.md`, `docs/demo-script.md`
 
 **Interfaces:**
 - README: what it is, live URL + login, local setup (`backend`: `bundle`, `db:prepare`, `db:seed`, `rails s`; `frontend`: `npm i`, `npm run dev`), test commands, repo map, links to the three docs.
-- `ai-usage.md`: tools used, how the work was split (decisions by the author, generation and tests by the tool, review by the author), the prompts/instructions that shaped the build, and what was corrected.
+- `ai-usage.md`: which AI tools were used and for what, the instructions that shaped the build, and what was reviewed and corrected by hand. Short and factual.
 - `performance.md`: seed time, endpoint timings from Task 9 against 10k rows, the scaling notes from the spec.
 - `demo-script.md`: 3-minute walkthrough order for the video.
 
-- [ ] **Step 1: Write all five.** — **Step 2: `bundle exec rspec` and `npm test` green; `git status` clean.**
+- [ ] **Step 1: Write all four.** — **Step 2: `bundle exec rspec` and `npm test` green; `git status` clean.**
 
 - [ ] **Step 3: Commit** — `git commit -m "docs: README, AI usage, performance notes and demo script"`

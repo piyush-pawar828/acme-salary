@@ -1,6 +1,6 @@
 # Salary Manager — Design
 
-Companion to [requirements.md](../../requirements.md). This records the technical decisions, the reasoning, and what is left to implementation.
+Companion to [requirements.md](requirements.md). This records the technical decisions, the reasoning, and what is left to implementation.
 
 ## Stack
 

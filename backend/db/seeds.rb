@@ -36,7 +36,7 @@ hr = User.find_by!(email: "hr@acme.example")
 countries = Country.all.index_by(&:code)
 departments = Department.all.index_by(&:name)
 department_names = departments.keys
-weighted_codes = SeedData::COUNTRY_WEIGHTS.flat_map { |code, weight| [code] * (weight * 100).round }
+weighted_codes = SeedData::COUNTRY_WEIGHTS.flat_map { |code, weight| [ code ] * (weight * 100).round }
 now = Time.current
 seed_today = Date.new(2026, 11, 1)
 
@@ -85,7 +85,7 @@ employee_rows.each_with_index do |row, i|
   history_size = rng.rand(1..3)
   # Current salary took effect within the last 18 months (never before hire);
   # earlier rows step back 12-24 months, each 4-12% lower, until the hire date.
-  latest_on = [seed_today - rng.rand(0..540), row[:hired_on]].max
+  latest_on = [ seed_today - rng.rand(0..540), row[:hired_on] ].max
   amount = current
   effective_on = latest_on
   history_size.times do |n|

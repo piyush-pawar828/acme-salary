@@ -13,7 +13,7 @@ module Api
         session[:user_id] = user.id
         render json: user_json(user)
       else
-        render json: { errors: { base: ["Invalid email or password"] } }, status: :unauthorized
+        render json: { errors: { base: [ "Invalid email or password" ] } }, status: :unauthorized
       end
     end
 

@@ -5,7 +5,7 @@ module Api
     before_action :require_login
 
     rescue_from ActiveRecord::RecordNotFound do
-      render json: { errors: { base: ["not found"] } }, status: :not_found
+      render json: { errors: { base: [ "not found" ] } }, status: :not_found
     end
 
     rescue_from ActiveRecord::RecordInvalid do |error|
@@ -13,7 +13,7 @@ module Api
     end
 
     rescue_from ActionController::ParameterMissing do |error|
-      render json: { errors: { base: [error.message] } }, status: :bad_request
+      render json: { errors: { base: [ error.message ] } }, status: :bad_request
     end
 
     private
@@ -23,7 +23,7 @@ module Api
     end
 
     def require_login
-      render json: { errors: { base: ["login required"] } }, status: :unauthorized unless current_user
+      render json: { errors: { base: [ "login required" ] } }, status: :unauthorized unless current_user
     end
 
     def user_json(user)

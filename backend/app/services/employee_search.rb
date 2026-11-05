@@ -13,7 +13,7 @@ class EmployeeSearch
 
   def initialize(params)
     @params = params.to_h.with_indifferent_access
-    @page = [@params[:page].to_i, 1].max
+    @page = [ @params[:page].to_i, 1 ].max
     @per_page = clamp_per_page(@params[:per_page])
   end
 
@@ -54,6 +54,6 @@ class EmployeeSearch
   def clamp_per_page(value)
     n = value.to_i
     return DEFAULT_PER_PAGE if n <= 0
-    [n, MAX_PER_PAGE].min
+    [ n, MAX_PER_PAGE ].min
   end
 end

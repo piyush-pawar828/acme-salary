@@ -45,7 +45,7 @@ RSpec.describe "Analytics" do
   describe Analytics::GroupStats do
     it "groups by country with per-group median, sorted by total desc" do
       result = Analytics::GroupStats.call(by: "country")
-      expect(result.map { |g| g[:label] }).to eq(["United States", "India"])
+      expect(result.map { |g| g[:label] }).to eq([ "United States", "India" ])
       expect(result.first).to eq(key: "US", label: "United States", headcount: 3, total_usd: 240_000,
                                  mean_usd: 80_000, median_usd: 80_000, min_usd: 60_000, max_usd: 100_000)
       expect(result.last).to include(key: "IN", headcount: 2, median_usd: 40_000)
@@ -53,15 +53,15 @@ RSpec.describe "Analytics" do
 
     it "groups by department and omits empty departments" do
       result = Analytics::GroupStats.call(by: "department")
-      expect(result.map { |g| g[:label] }).to eq(["Engineering", "Sales"])
+      expect(result.map { |g| g[:label] }).to eq([ "Engineering", "Sales" ])
       expect(result.first).to include(key: engineering.id, headcount: 3, total_usd: 210_000, median_usd: 60_000)
     end
 
     it "gives a single-member group median equal to mean" do
       Employee.where(first_name: %w[us2 us3 in1 in2]).find_each(&:destroy!)
       result = Analytics::GroupStats.call(by: "country")
-      expect(result).to eq([{ key: "US", label: "United States", headcount: 1, total_usd: 100_000,
-                              mean_usd: 100_000, median_usd: 100_000, min_usd: 100_000, max_usd: 100_000 }])
+      expect(result).to eq([ { key: "US", label: "United States", headcount: 1, total_usd: 100_000,
+                              mean_usd: 100_000, median_usd: 100_000, min_usd: 100_000, max_usd: 100_000 } ])
     end
 
     it "rejects an unknown dimension" do

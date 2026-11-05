@@ -14,7 +14,7 @@ RSpec.describe "Session" do
     post "/api/session", params: { email: user.email, password: "nope" }, as: :json
 
     expect(response).to have_http_status(:unauthorized)
-    expect(response.parsed_body).to eq("errors" => { "base" => ["Invalid email or password"] })
+    expect(response.parsed_body).to eq("errors" => { "base" => [ "Invalid email or password" ] })
   end
 
   it "returns 401 from GET /api/session when logged out" do

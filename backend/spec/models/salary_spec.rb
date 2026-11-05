@@ -17,7 +17,7 @@ RSpec.describe Salary do
   end
 
   it "rejects zero and negative amounts" do
-    [0, -1].each do |amount|
+    [ 0, -1 ].each do |amount|
       salary = Salary.new(employee: create_employee, amount: amount, currency_code: "USD",
                           effective_on: Date.new(2026, 1, 1), created_by: hr_user)
       expect(salary).not_to be_valid

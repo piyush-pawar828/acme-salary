@@ -10,9 +10,9 @@ RSpec.describe "GET /api/meta" do
 
     expect(response).to have_http_status(:ok)
     expect(response.parsed_body).to eq(
-      "countries" => [{ "id" => country.id, "code" => "US", "name" => "United States", "currency_code" => "USD",
-                        "usd_rate" => "1.0", "rate_as_of" => "2026-11-01" }],
-      "departments" => [{ "id" => department.id, "name" => "Engineering" }]
+      "countries" => [ { "id" => country.id, "code" => "US", "name" => "United States", "currency_code" => "USD",
+                        "usd_rate" => "1.0", "rate_as_of" => "2026-11-01" } ],
+      "departments" => [ { "id" => department.id, "name" => "Engineering" } ]
     )
   end
 end

@@ -6,14 +6,14 @@ module SeedData
 
   # code, name, currency, USD per 1 unit of local currency (fixed as of RATE_AS_OF)
   COUNTRIES = [
-    ["US", "United States",  "USD", 1.0],
-    ["IN", "India",          "INR", 0.012],
-    ["GB", "United Kingdom", "GBP", 1.27],
-    ["DE", "Germany",        "EUR", 1.08],
-    ["CA", "Canada",         "CAD", 0.72],
-    ["AU", "Australia",      "AUD", 0.65],
-    ["SG", "Singapore",      "SGD", 0.74],
-    ["BR", "Brazil",         "BRL", 0.17]
+    [ "US", "United States",  "USD", 1.0 ],
+    [ "IN", "India",          "INR", 0.012 ],
+    [ "GB", "United Kingdom", "GBP", 1.27 ],
+    [ "DE", "Germany",        "EUR", 1.08 ],
+    [ "CA", "Canada",         "CAD", 0.72 ],
+    [ "AU", "Australia",      "AUD", 0.65 ],
+    [ "SG", "Singapore",      "SGD", 0.74 ],
+    [ "BR", "Brazil",         "BRL", 0.17 ]
   ].freeze
 
   # Share of headcount per country; sums to 1.0.
@@ -30,27 +30,27 @@ module SeedData
 
   # department => [[job title, USD band], ...]
   DEPARTMENTS = {
-    "Engineering" => [["Junior Software Engineer", 60_000], ["Software Engineer", 95_000],
-                      ["Senior Software Engineer", 135_000], ["Staff Engineer", 175_000],
-                      ["Engineering Manager", 170_000]],
-    "Product" => [["Associate Product Manager", 70_000], ["Product Manager", 110_000],
-                  ["Senior Product Manager", 145_000], ["Director of Product", 190_000]],
-    "Design" => [["Junior Designer", 55_000], ["Product Designer", 90_000],
-                 ["Senior Product Designer", 125_000], ["Design Lead", 150_000]],
-    "Sales" => [["Sales Development Rep", 50_000], ["Account Executive", 85_000],
-                ["Senior Account Executive", 120_000], ["Sales Manager", 140_000]],
-    "Marketing" => [["Marketing Coordinator", 48_000], ["Marketing Manager", 85_000],
-                    ["Senior Marketing Manager", 115_000], ["Head of Marketing", 160_000]],
-    "Finance" => [["Accountant", 60_000], ["Financial Analyst", 80_000],
-                  ["Finance Manager", 120_000], ["Controller", 160_000]],
-    "Human Resources" => [["HR Coordinator", 50_000], ["HR Business Partner", 85_000],
-                          ["Senior HR Business Partner", 110_000], ["HR Director", 150_000]],
-    "Operations" => [["Operations Associate", 48_000], ["Operations Analyst", 70_000],
-                     ["Operations Manager", 105_000], ["Head of Operations", 150_000]],
-    "Customer Support" => [["Support Specialist", 42_000], ["Senior Support Specialist", 58_000],
-                           ["Support Team Lead", 75_000], ["Support Manager", 95_000]],
-    "Legal" => [["Paralegal", 65_000], ["Legal Counsel", 130_000],
-                ["Senior Legal Counsel", 170_000], ["General Counsel", 230_000]]
+    "Engineering" => [ [ "Junior Software Engineer", 60_000 ], [ "Software Engineer", 95_000 ],
+                      [ "Senior Software Engineer", 135_000 ], [ "Staff Engineer", 175_000 ],
+                      [ "Engineering Manager", 170_000 ] ],
+    "Product" => [ [ "Associate Product Manager", 70_000 ], [ "Product Manager", 110_000 ],
+                  [ "Senior Product Manager", 145_000 ], [ "Director of Product", 190_000 ] ],
+    "Design" => [ [ "Junior Designer", 55_000 ], [ "Product Designer", 90_000 ],
+                 [ "Senior Product Designer", 125_000 ], [ "Design Lead", 150_000 ] ],
+    "Sales" => [ [ "Sales Development Rep", 50_000 ], [ "Account Executive", 85_000 ],
+                [ "Senior Account Executive", 120_000 ], [ "Sales Manager", 140_000 ] ],
+    "Marketing" => [ [ "Marketing Coordinator", 48_000 ], [ "Marketing Manager", 85_000 ],
+                    [ "Senior Marketing Manager", 115_000 ], [ "Head of Marketing", 160_000 ] ],
+    "Finance" => [ [ "Accountant", 60_000 ], [ "Financial Analyst", 80_000 ],
+                  [ "Finance Manager", 120_000 ], [ "Controller", 160_000 ] ],
+    "Human Resources" => [ [ "HR Coordinator", 50_000 ], [ "HR Business Partner", 85_000 ],
+                          [ "Senior HR Business Partner", 110_000 ], [ "HR Director", 150_000 ] ],
+    "Operations" => [ [ "Operations Associate", 48_000 ], [ "Operations Analyst", 70_000 ],
+                     [ "Operations Manager", 105_000 ], [ "Head of Operations", 150_000 ] ],
+    "Customer Support" => [ [ "Support Specialist", 42_000 ], [ "Senior Support Specialist", 58_000 ],
+                           [ "Support Team Lead", 75_000 ], [ "Support Manager", 95_000 ] ],
+    "Legal" => [ [ "Paralegal", 65_000 ], [ "Legal Counsel", 130_000 ],
+                [ "Senior Legal Counsel", 170_000 ], [ "General Counsel", 230_000 ] ]
   }.freeze
 
   def self.usd_rate(country_code)

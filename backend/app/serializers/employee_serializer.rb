@@ -18,7 +18,7 @@ module EmployeeSerializer
   end
 
   def detail(employee)
-    history = employee.salaries.sort_by { |s| [s.effective_on, s.id] }.reverse
+    history = employee.salaries.sort_by { |s| [ s.effective_on, s.id ] }.reverse
     summary(employee).merge(
       salary_history: history.map { |s| history_row(s, employee.country) }
     )

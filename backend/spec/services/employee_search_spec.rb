@@ -14,16 +14,16 @@ RSpec.describe EmployeeSearch do
     ada = create_employee(first_name: "Ada", last_name: "Lovelace", email: "ada@acme.example")
     grace = create_employee(first_name: "Grace", last_name: "Hopper", email: "ghopper@acme.example")
 
-    expect(ids(q: "lovel")).to eq([ada.id])
-    expect(ids(q: "GHOPPER")).to eq([grace.id])
-    expect(ids(q: "Ada Lovelace")).to eq([ada.id])
+    expect(ids(q: "lovel")).to eq([ ada.id ])
+    expect(ids(q: "GHOPPER")).to eq([ grace.id ])
+    expect(ids(q: "Ada Lovelace")).to eq([ ada.id ])
   end
 
   it "treats % and _ in q literally" do
     percent = create_employee(first_name: "50%", last_name: "Off")
     create_employee(first_name: "Plain", last_name: "Name")
 
-    expect(ids(q: "%")).to eq([percent.id])
+    expect(ids(q: "%")).to eq([ percent.id ])
     expect(ids(q: "_")).to eq([])
   end
 
@@ -32,7 +32,7 @@ RSpec.describe EmployeeSearch do
     create_employee(country: india, department: engineering)
     create_employee(country: us, department: sales)
 
-    expect(ids(country: "IN", department: sales.id)).to eq([match.id])
+    expect(ids(country: "IN", department: sales.id)).to eq([ match.id ])
   end
 
   it "sorts by USD salary desc across currencies" do
@@ -43,16 +43,16 @@ RSpec.describe EmployeeSearch do
     create_salary(employee: poor, amount: 90_000)
     poor.update_column(:current_salary_id, poor.salaries.first.id)
 
-    expect(ids(sort: "salary", dir: "desc")).to eq([rich.id, poor.id])
-    expect(ids(sort: "salary", dir: "asc")).to eq([poor.id, rich.id])
+    expect(ids(sort: "salary", dir: "desc")).to eq([ rich.id, poor.id ])
+    expect(ids(sort: "salary", dir: "asc")).to eq([ poor.id, rich.id ])
   end
 
   it "sorts by name by default and by hire date on request" do
     older = create_employee(first_name: "Zed", last_name: "Young", hired_on: Date.new(2015, 1, 1))
     newer = create_employee(first_name: "Amy", last_name: "Old", hired_on: Date.new(2022, 1, 1))
 
-    expect(ids({})).to eq([newer.id, older.id])
-    expect(ids(sort: "hired_on", dir: "asc")).to eq([older.id, newer.id])
+    expect(ids({})).to eq([ newer.id, older.id ])
+    expect(ids(sort: "hired_on", dir: "asc")).to eq([ older.id, newer.id ])
   end
 
   it "clamps page and per_page" do

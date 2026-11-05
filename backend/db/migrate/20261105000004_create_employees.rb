@@ -11,6 +11,6 @@ class CreateEmployees < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     add_index :employees, :email, unique: true
-    add_index :employees, [:last_name, :first_name]
+    add_index :employees, [ :last_name, :first_name ]
   end
 end

@@ -9,6 +9,6 @@ class CreateSalaries < ActiveRecord::Migration[8.1]
       t.references :created_by, null: false, foreign_key: { to_table: :users }
       t.timestamps
     end
-    add_index :salaries, [:employee_id, :effective_on]
+    add_index :salaries, [ :employee_id, :effective_on ]
   end
 end

@@ -1,7 +1,7 @@
 module Api
   class AnalyticsController < BaseController
     rescue_from ArgumentError do |error|
-      render json: { errors: { base: [error.message] } }, status: :bad_request
+      render json: { errors: { base: [ error.message ] } }, status: :bad_request
     end
 
     def overview

@@ -14,7 +14,7 @@ module Analytics
       rows = Base.scope.joins(dimension[:join])
                  .pluck(Arel.sql(dimension[:key]), Arel.sql(dimension[:label]), Base.usd_sql)
 
-      rows.group_by { |key, label, _| [key, label] }
+      rows.group_by { |key, label, _| [ key, label ] }
           .map { |(key, label), group| row(key, label, Stats.summarize(group.map(&:last))) }
           .sort_by { |g| -g[:total_usd] }
     end

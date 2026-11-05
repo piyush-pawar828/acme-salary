@@ -61,14 +61,14 @@ RSpec.describe "Employee CRUD" do
 
       expect(response).to have_http_status(:ok)
       history = response.parsed_body["salary_history"]
-      expect(history.map { |h| h["amount"] }).to eq(["1200000.0", "1000000.0"])
+      expect(history.map { |h| h["amount"] }).to eq([ "1200000.0", "1000000.0" ])
       expect(history.first["usd"]).to eq("14400.0")
     end
 
     it "returns 404 for an unknown id" do
       get "/api/employees/999999"
       expect(response).to have_http_status(:not_found)
-      expect(response.parsed_body).to eq("errors" => { "base" => ["not found"] })
+      expect(response.parsed_body).to eq("errors" => { "base" => [ "not found" ] })
     end
   end
 
